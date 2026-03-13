@@ -1,30 +1,36 @@
-📰 Image-Driven News Article Generation
-Using Fake Image Detection, Transformer-Based Captioning, and LLM Synthesis
-📌 Overview
+# 📰 Image-Driven News Article Generation
+## Using Fake Image Detection, Transformer-Based Captioning, and LLM Synthesis
 
-This project presents a complete multimodal AI pipeline for automatic news article generation from images.
+---
+
+# 📌 Overview
+
+This project presents a **complete multimodal AI pipeline** for automatic news article generation from images.
 
 The system consists of:
 
-🔴 Transformer-based image caption generation (Core Research Contribution)
+🔴 **Transformer-based image caption generation (Core Research Contribution)**  
+🛡 **Fake image detection (Real vs AI-generated)**  
+✍️ **LLM-based structured news synthesis**  
+🌐 **End-to-end deployment using Streamlit**
 
-🛡 Fake image detection (Real vs AI-generated)
+The **primary scientific contribution** lies in **domain-adaptive fine-tuning of a Vision-Language Transformer (BLIP)** for news caption generation.
 
-✍️ LLM-based structured news synthesis
+All other modules are **system-level extensions built around the captioning model.**
 
-🌐 End-to-end deployment using Streamlit
+---
 
-The primary scientific contribution lies in domain-adaptive fine-tuning of a Vision-Language Transformer (BLIP) for news caption generation.
+# 🎯 Research Objective
 
-All other modules are system-level extensions built around the captioning model.
+To fine-tune a **transformer-based multimodal captioning model on news-domain imagery** and evaluate its improvement over a base pretrained model using standard captioning metrics.
 
-🎯 Research Objective
+---
 
-To fine-tune a transformer-based multimodal captioning model on news-domain imagery and evaluate its improvement over a base pretrained model using standard captioning metrics.
+# 🏗 Complete System Architecture
 
-🏗 Complete System Architecture
-1️⃣ Dataset Collection & Training : 
+## 1️⃣ Dataset Collection & Training
 
+```text
 ┌──────────────────────┐
 │   NYT News URLs      │
 └──────────┬───────────┘
@@ -66,11 +72,15 @@ To fine-tune a transformer-based multimodal captioning model on news-domain imag
 │ Evaluation: BLEU &   │
 │        CIDEr         │
 └──────────────────────┘
+```
 
-This stage represents the core research contribution.
+This stage represents the **core research contribution**.
 
-2️⃣ Transformer Captioning Architecture (Model-Level)
+---
 
+# 2️⃣ Transformer Captioning Architecture (Model-Level)
+
+```text
 ┌──────────────────┐
 │   Input Image    │
 └────────┬─────────┘
@@ -94,33 +104,42 @@ This stage represents the core research contribution.
 ┌──────────────────┐
 │ Generated Caption│
 └──────────────────┘
+```
 
-Mathematical Formulation (GitHub-safe)
+---
 
-Vision Encoding:
+# Mathematical Formulation
 
+### Vision Encoding
+
+```
 I → Ev(I)
+```
 
-Autoregressive Caption Generation:
+### Autoregressive Caption Generation
 
+```
 P(wt | w<t, V)
+```
 
-Training Objective:
+### Training Objective
 
+```
 L = - Σ log P(wt | w<t, V)
+```
 
 Where:
 
-I = input image
+- **I** = input image  
+- **V** = image embeddings  
+- **wt** = token at time t  
+- **L** = cross-entropy loss  
 
-V = image embeddings
+---
 
-wt = token at time t
+# 3️⃣ End-to-End Deployment Architecture
 
-L = cross-entropy loss
-
-3️⃣ End-to-End Deployment Architecture
-
+```text
 ┌─────────────────────────┐
 │   User Upload Image     │
 └────────────┬────────────┘
@@ -152,165 +171,187 @@ L = cross-entropy loss
                    │ Structured News Article    │
                    │          Output            │
                    └────────────────────────────┘
+```
 
+---
 
+# 📂 Dataset Preparation
 
-📂 Dataset Preparation
+## 🔹 Data Sources
 
-🔹 Data Sources
+### NYT News Article URLs
 
-NYT News Article URLs
+- Scraped from official news pages  
+- Extract associated images and captions  
 
-Scraped from official news pages
+### Public News Event Imagery
 
-Extract associated images and captions
+- Open-source journalistic datasets  
+- Event-based real-world images with annotations  
 
-Public News Event Imagery
+---
 
-Open-source journalistic datasets
+## 🔹 Data Processing Steps
 
-Event-based real-world images with annotations
+### Extract Image URLs
+- Parse HTML content  
+- Identify `<img>` tags and metadata  
 
-🔹 Data Processing Steps
+### Download Images
+- Use `requests` or `aiohttp`  
+- Validate image integrity  
+- Store in `/images` directory  
 
-Extract Image URLs
+### Extract Ground-Truth Captions
+- Capture original article captions  
+- Map each caption to corresponding image  
 
-Parse HTML content
+### Normalize Captions
+- Convert to lowercase  
+- Remove special characters  
+- Remove extra whitespace  
+- Standardize punctuation  
 
-Identify <img> tags and metadata
+### Construct Structured CSV Dataset
+- Map image path ↔ cleaned caption  
+- Ensure no duplicates  
+- Remove corrupt samples  
 
-Download Images
+---
 
-Use requests or aiohttp
+## 🔹 Dataset Format
 
-Validate image integrity
+| image_path | caption |
+|---|---|
+| images/001.jpg | protesters gather outside parliament |
+| images/002.jpg | a worker operates machinery in shanghai |
 
-Store in /images directory
+---
 
-Extract Ground-Truth Captions
+# 🧠 Core Model: Transformer-Based Captioning
 
-Capture original article captions
+## Base Model Used
 
-Map each caption to corresponding image
-
-Normalize Captions
-
-Convert to lowercase
-
-Remove special characters
-
-Remove extra whitespace
-
-Standardize punctuation
-
-Construct Structured CSV Dataset
-
-Map image path ↔ cleaned caption
-
-Ensure no duplicates
-
-Remove corrupt samples
-
-🔹 Dataset Format
-image_path	caption
-images/001.jpg	protesters gather outside parliament
-images/002.jpg	a worker operates machinery in shanghai
-
-🧠 Core Model: Transformer-Based Captioning
-
-Base Model Used:
-
+```
 Salesforce/blip-image-captioning-base
+```
 
-Architecture Components
-Vision Encoder
+---
 
-Uses Vision Transformer (ViT) to convert images into patch embeddings.
+## Architecture Components
 
-Transformer Decoder
+### Vision Encoder
 
-Generates caption autoregressively conditioned on image embeddings.
+Uses **Vision Transformer (ViT)** to convert images into **patch embeddings**.
 
-🔧 Fine-Tuning Strategy
+### Transformer Decoder
 
-Parameter	Configuration
-Dataset Size	~35000 samples
-Optimizer	AdamW
-Device	Apple Silicon (MPS)
-Loss Function	Cross-Entropy
-Training Strategy	Teacher Forcing
+Generates captions **autoregressively conditioned on image embeddings.**
+
+---
+
+# 🔧 Fine-Tuning Strategy
+
+| Parameter | Configuration |
+|---|---|
+| Dataset Size | ~35000 samples |
+| Optimizer | AdamW |
+| Device | Apple Silicon (MPS) |
+| Loss Function | Cross-Entropy |
+| Training Strategy | Teacher Forcing |
 
 Model artifacts saved to:
 
+```
 saved_model/
+```
 
-📊 Evaluation Methodology
+---
 
-Metrics Used
-BLEU
+# 📊 Evaluation Methodology
 
-Measures n-gram overlap precision between generated and reference captions.
+## Metrics Used
 
-CIDEr
+### BLEU
+Measures **n-gram overlap precision** between generated and reference captions.
 
-TF-IDF weighted consensus similarity metric optimized for image captioning.
+### CIDEr
+TF-IDF weighted **consensus similarity metric optimized for image captioning.**
 
-Experimental Results
+---
 
-Metric	Base Model	Fine-Tuned	Improvement
-BLEU	0.0033	0.0213	+537%
-CIDEr	0.0426	0.0945	+121%
-Interpretation
+## Experimental Results
 
-Significant improvement in domain adaptation
+| Metric | Base Model | Fine-Tuned | Improvement |
+|---|---|---|---|
+| BLEU | 0.0033 | 0.0213 | +537% |
+| CIDEr | 0.0426 | 0.0945 | +121% |
 
-Better semantic alignment with news captions
+---
 
-Higher consensus similarity
+## Interpretation
 
-🛡 Fake Image Detection (Extension)
+- Significant improvement in **domain adaptation**
+- Better **semantic alignment with news captions**
+- Higher **consensus similarity**
 
-Model Used:
+---
 
+# 🛡 Fake Image Detection (Extension)
+
+### Model Used
+
+```
 umm-maybe/AI-image-detector
+```
 
-Type:
+### Type
 
-Vision Transformer classifier trained on real vs AI-generated images.
+Vision Transformer classifier trained on **real vs AI-generated images**.
 
-Decision Rule:
+### Decision Rule
 
+```
 If AI probability ≥ 0.85 → Block article generation
 Else → Continue
+```
 
-✍️ LLM-Based News Article Generation (Extension)
+---
 
-LLM Used:
+# ✍️ LLM-Based News Article Generation (Extension)
 
+### LLM Used
+
+```
 llama-3.1-8b-instant (Groq API)
+```
 
-Process
+### Process
 
-Caption generated from BLIP
+1. Caption generated from BLIP  
+2. Prompt template constructed  
+3. News category inferred  
+4. Structured journalistic article generated  
 
-Prompt template constructed
+---
 
-News category inferred
+# 🌐 Deployment
 
-Structured journalistic article generated
-
-🌐 Deployment
-
-Framework: Streamlit
+Framework: **Streamlit**
 
 Run locally:
 
+```bash
 conda activate newsenv
 cd single_image_news_pipeline
 python -m streamlit run web_app.py
+```
 
-📁 Repository Structure
+---
 
+# 📁 Repository Structure
+
+```text
 news_caption_project/
 │
 ├── data/
@@ -331,60 +372,53 @@ news_caption_project/
     │   └── news_generator.py
     └── utils/
         └── news_templates.py
-        
-🧰 Technologies Used
+```
 
-PyTorch — Model training
+---
 
-Transformers — BLIP and AI detector
+# 🧰 Technologies Used
 
-Evaluate — BLEU
+- **PyTorch** — Model training  
+- **Transformers** — BLIP and AI detector  
+- **Evaluate** — BLEU  
+- **pycocoevalcap** — CIDEr  
+- **Streamlit** — Web interface  
+- **Requests** — LLM API  
+- **Pillow** — Image processing  
+- **NumPy** — Numerical operations  
 
-pycocoevalcap — CIDEr
+---
 
-Streamlit — Web interface
+# 🔬 Key Contributions
 
-Requests — LLM API
+- Domain-adaptive **transformer-based captioning**
+- Quantitative evaluation with **standard metrics**
+- Integrated **authenticity filtering**
+- LLM-based **structured article synthesis**
+- Fully deployable **multimodal pipeline**
 
-Pillow — Image processing
+---
 
-NumPy — Numerical operations
+# ⚠️ Limitations
 
-🔬 Key Contributions
+- AI image detection is **probabilistic**
+- BLEU does not capture **full semantic richness**
+- LLM may introduce **contextual hallucinations**
+- Performance depends on **dataset scale**
 
-Domain-adaptive transformer-based captioning
+---
 
-Quantitative evaluation with standard metrics
+# 🚀 Future Work
 
-Integrated authenticity filtering
+- Larger-scale fine-tuning  
+- Multi-reference evaluation  
+- Human evaluation study  
+- Cloud deployment  
+- Model compression  
 
-LLM-based structured article synthesis
+---
 
-Fully deployable multimodal pipeline
+# 👤 Author
 
-⚠️ Limitations
-
-AI image detection is probabilistic
-
-BLEU does not capture full semantic richness
-
-LLM may introduce contextual hallucinations
-
-Performance depends on dataset scale
-
-🚀 Future Work
-
-Larger-scale fine-tuning
-
-Multi-reference evaluation
-
-Human evaluation study
-
-Cloud deployment
-
-Model compression
-
-👤 Author
-
-Phani Inturi
+**Phani Inturi**  
 AI Research – Multimodal Systems
